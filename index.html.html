@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Player Pairing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .pair {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Random Player Pairing</h1>
+        <p>Enter advanced players and non-advanced players. Each name should be on a new line.</p>
+
+        <label for="advancedPlayers">Advanced Players:</label>
+        <textarea id="advancedPlayers" placeholder="Enter advanced players..."></textarea>
+
+        <label for="nonAdvancedPlayers">Non-Advanced Players:</label>
+        <textarea id="nonAdvancedPlayers" placeholder="Enter non-advanced players..."></textarea>
+
+        <button onclick="handleGeneratePairs()">Generate Random Pairs</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Function to randomly shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Function to pair players from List A and List B
+        function generateRandomPairs(listA, listB) {
+            // Shuffle both lists
+            shuffleArray(listA);
+            shuffleArray(listB);
+
+            const pairs = [];
+
+            // Pair players from both lists
+            const maxLength = Math.min(listA.length, listB.length);
+            for (let i = 0; i < maxLength; i++) {
+                pairs.push({ advanced: listA[i], nonAdvanced: listB[i] });
+            }
+
+            // Handle leftover players, if any
+            const leftovers = listA.slice(maxLength).concat(listB.slice(maxLength));
+
+            return { pairs, leftovers };
+        }
+
+        // Handle button click to generate pairs
+        function handleGeneratePairs() {
+            const advancedPlayersInput = document.getElementById("advancedPlayers").value;
+            const nonAdvancedPlayersInput = document.getElementById("nonAdvancedPlayers").value;
+
+            const advancedPlayers = advancedPlayersInput.split("\n").map(name => name.trim()).filter(name => name);
+            const nonAdvancedPlayers = nonAdvancedPlayersInput.split("\n").map(name => name.trim()).filter(name => name);
+
+            const { pairs, leftovers } = generateRandomPairs(advancedPlayers, nonAdvancedPlayers);
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+
+            if (pairs.length > 0) {
+                const pairsDiv = document.createElement("div");
+                pairsDiv.innerHTML = "<h2>Random Pairs:</h2>";
+                pairs.forEach(pair => {
+                    const pairDiv = document.createElement("div");
+                    pairDiv.className = "pair";
+                    pairDiv.textContent = `${pair.advanced} + ${pair.nonAdvanced}`;
+                    pairsDiv.appendChild(pairDiv);
+                });
+                resultDiv.appendChild(pairsDiv);
+            } else {
+                resultDiv.innerHTML = "<h2>No pairs generated.</h2>";
+            }
+
+            if (leftovers.length > 0) {
+                const leftoversDiv = document.createElement("div");
+                leftoversDiv.innerHTML = `<h2>Leftover Players:</h2><p>${leftovers.join(", ")}</p>`;
+                resultDiv.appendChild(leftoversDiv);
+            }
+        }
+    </script>
+</body>
+</html>
